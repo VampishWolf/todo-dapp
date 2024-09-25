@@ -1,0 +1,19 @@
+meta {
+  name: Create ToDo
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:7979/api/v1/todos
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  { "title": "Sample ToDo", "description": "This is a sample ToDo description", "dueDate": "2024-08-31T00:00:00.000Z", "priority": "medium" }
+}

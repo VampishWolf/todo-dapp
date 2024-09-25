@@ -1,0 +1,4 @@
+src/__tests__/
+src/__tests__setup__/
+src/__tests__suites__/
+src/__mocks__

@@ -1,0 +1,25 @@
+meta {
+  name: Complete ToDo
+  type: http
+  seq: 6
+}
+
+put {
+  url: http://localhost:7979/api/v1/todos/daae082d-2582-4a70-8cac-235e1d755682
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Sample ToDo",
+    "description": "This is a sample ToDo description",
+    "dueDate": "2024-08-31T00:00:00.000Z",
+    "priority": "medium",
+    "completed": true
+  }
+}

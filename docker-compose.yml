@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:15.2-bullseye
+    container_name: postgres
+    restart: always
+    volumes:
+      - "postgresdb_data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "dev"
+    ports:
+      - "5431:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6378:6379"
+    networks:
+      - app-network
+
+  todo-api:
+    build: ./api
+    container_name: todo-api
+    ports:
+      - "7979:7979"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgresdb_data:

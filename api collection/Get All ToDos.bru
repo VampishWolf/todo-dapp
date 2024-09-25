@@ -1,0 +1,20 @@
+meta {
+  name: Get All ToDos
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:7979/api/v1/todos?page=1&limit=10
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  limit: 10
+}
+
+headers {
+  Content-Type: application/json
+}
