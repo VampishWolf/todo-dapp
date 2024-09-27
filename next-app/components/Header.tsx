@@ -1,21 +1,19 @@
+"use client"
 
-
-import { WalletDialog } from "./WalletDialog";
-
-// Add this at the top of your file or in a separate type declaration file
-declare global {
-    interface Window {
-        ethereum: any;
-    }
-}
+import { useAccount } from 'wagmi';
+import { WalletDialog } from './WalletDialog';
 
 function Header() {
+    const { address, isConnected } = useAccount()
 
     return (
-        <div className="p-2 flex items-center justify-end text-black">
+        <div className="p-2 flex items-center justify-end text-black gap-4">
+            {isConnected ? (<p>{address}</p>) : null}
+            {/* *TO DO - Custom Wallet connection without external providers.  */}
             <WalletDialog />
+            {/* <ConnectKitButton /> */}
         </div>
     )
 }
 
-export default Header
+export default Header   

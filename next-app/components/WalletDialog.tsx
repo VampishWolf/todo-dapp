@@ -10,10 +10,14 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog"
 import { useEffect, useState } from "react"
+import { useAccount, useConnect, useDisconnect } from "wagmi"
 
 export function WalletDialog() {
     const [account, setAccount] = useState<string | null>(null)
 
+    const { connect, connectors, error } = useConnect()
+    const { isConnected } = useAccount()
+    const { disconnect } = useDisconnect()
     const connectMetaMask = async () => {
         if (window.ethereum) {
             try {
@@ -29,6 +33,7 @@ export function WalletDialog() {
     }
 
     const disconnectMetaMask = () => {
+        disconnect()
         setAccount(null)
     }
 
@@ -44,26 +49,28 @@ export function WalletDialog() {
         checkConnection()
     }, [])
 
+    if (isConnected) {
+        return (
+            <Button onClick={disconnectMetaMask} variant="destructive">Disconnect</Button>
+        )
+    }
+
     return (
         <Dialog>
-            {account ? (
-                <Button onClick={disconnectMetaMask} variant="destructive">Disconnect</Button>
-            ) : (
-                <DialogTrigger asChild>
-                    <Button variant="default">Connect Wallet</Button>
-                </DialogTrigger>
-            )}
+            <DialogTrigger asChild>
+                <Button variant="default">Connect Wallet</Button>
+            </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Connect Wallet</DialogTitle>
                     <DialogDescription>
-                        Select your wallet below
+                        Select your preferred wallet below
                     </DialogDescription>
                 </DialogHeader>
 
 
                 <Button onClick={connectMetaMask}>Metamask</Button>
-                <Button >WalletConnect</Button>
+                <Button>WalletConnect</Button>
             </DialogContent>
         </Dialog>
     )
