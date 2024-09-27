@@ -30,14 +30,13 @@ services:
       - "7979:7979"
     networks:
       - app-network
-
-  next-app:
-    build: ./next-app
-    container_name: next-app
-    ports:
-      - "3000:3000"
-    networks:
-      - app-network
+  # next-app:
+  #   build: ./next-app
+  #   container_name: next-app
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
