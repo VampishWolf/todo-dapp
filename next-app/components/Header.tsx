@@ -10,15 +10,20 @@ function Header() {
     const { disconnect } = useDisconnect()
 
     return (
-        <div className="p-2 flex items-center justify-end text-black gap-4">
-            {/* *TO DO - Custom Wallet connection without external providers.  */}
-            {/* {isConnected ? (<p>{address}</p>) : <Button variant="default" onClick={() => open()}>Connect Wallet</Button>} */}
+        <div className="p-5 mx-1 flex items-center justify-between text-black gap-4">
+            <div className='font-extrabold text-xl'>ToDoo DApp</div>
+            {/* Check if wallet is connected */}
             {isConnected
-                ? <Button onClick={() => disconnect()} variant="destructive">Disconnect</Button>
-                : <Button variant="default" onClick={() => open()}>Connect Wallet</Button>}
-            {/* <WalletDialog /> */}
-            {/* {isConnected ? <w3m-button /> : <w3m-account-button />} */}
-            {/* <w3m-network-button /> */}
+                ? <Button
+                    className='text-black font-semibold outline-none'
+                    onClick={() => open()}
+                    variant="destructive"
+                >
+                    {address?.slice(0, 6)}...{address?.slice(-4)}
+                </Button>
+                : <Button variant="default" onClick={() => open()}>
+                    Connect Wallet
+                </Button>}
         </div>
     )
 }
