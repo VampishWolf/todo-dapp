@@ -24,6 +24,7 @@ export function WalletDialog() {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
                 setAccount(accounts[0])
                 console.log(account)
+
             } catch (error) {
                 console.error("Error connecting to MetaMask", error)
             }

@@ -1,7 +1,9 @@
-import { Web3Provider } from "@/components/Web3Provider";
+import ContextProvider from '@/context';
 import { QueryClient } from "@tanstack/react-query";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
+
 import { ReactNode } from "react";
 import "./globals.css";
 
@@ -28,14 +30,14 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const cookies = headers().get('cookie')
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Web3Provider>
-          {children}
-        </Web3Provider>
+        <ContextProvider cookies={cookies}>{children}</ContextProvider>
       </body>
     </html>
   );
