@@ -1,6 +1,6 @@
 'use client'
 
-import { createToDo } from "@/actions/todoCrud"
+import { createToDo, fetchToDos } from "@/actions/todoCrud"
 import { PlusCircle } from "lucide-react"
 import { useState } from "react"
 import { DatePicker } from "./DatePicker"
@@ -15,7 +15,7 @@ interface ToDoData {
     priority: string;
 }
 
-function CreateToDo() {
+function CreateToDo({ setTodos }: { setTodos: any }) {
     const [todoData, setTodoData] = useState<ToDoData>({
         title: '',
         description: '',
@@ -33,13 +33,18 @@ function CreateToDo() {
     };
 
     const createEntry = async () => {
-        console.log(todoData);  // Submit the form here
         await createToDo({
             title: todoData.title,
             description: todoData.description,
             dueDate: todoData.dueDate,
             priority: todoData.priority
-        })
+        });
+
+        // Refetch the todos list after creation
+        const data = await fetchToDos();
+        if (data.success) {
+            setTodos(data.todos.data);
+        }
     };
 
     return (
