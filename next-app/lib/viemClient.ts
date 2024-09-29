@@ -1,6 +1,13 @@
 
-import { createPublicClient, http } from 'viem'
-import { polygonAmoy } from 'viem/chains'
+import { createPublicClient, http } from 'viem';
+import { polygonAmoy } from 'viem/chains';
+
+
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
 
 export const publicClient = createPublicClient({
     chain: polygonAmoy,
@@ -12,5 +19,5 @@ export const publicClient = createPublicClient({
 //     transport: custom(window.ethereum)
 // })
 
-// JSON-RPC Account
+// // JSON-RPC Account
 // export const [account] = await walletClient.getAddresses()

@@ -8,6 +8,7 @@ export interface IToDo {
     description: string;
     dueDate: string;
     priority: string;
+    completed?: boolean;
 }
 
 export const fetchToDos = async () => {
@@ -30,6 +31,21 @@ export const createToDo = async (obj: IToDo) => {
 
     } catch (error) {
         console.error(error)
+        return { success: false }
+    }
+
+}
+
+export const updateToDo = async (id: string, obj: IToDo) => {
+    try {
+        obj.completed = false
+        console.log(id, obj)
+        const res = await axios.put(`${process.env.BACKEND_API_BASE_URL}/api/v1/todos/${id}`, obj);
+
+        return { success: true, todos: res.data };
+
+    } catch (error) {
+        console.error('Error Response:', error);
         return { success: false }
     }
 

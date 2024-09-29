@@ -1,6 +1,5 @@
 import { polygonAmoy } from '@/lib/amoyNetwork'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { polygon } from '@reown/appkit/networks'
 import { cookieStorage, createStorage } from '@wagmi/core'
 
 // Get projectId from https://cloud.reown.com
@@ -10,7 +9,7 @@ if (!projectId) {
     throw new Error('Project ID is not defined')
 }
 
-export const networks = [polygonAmoy, polygon]
+export const networks = [polygonAmoy]
 
 //Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({

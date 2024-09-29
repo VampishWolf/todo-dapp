@@ -2,7 +2,6 @@
 
 import { projectId, wagmiAdapter } from '@/config'
 import { polygonAmoy } from '@/lib/amoyNetwork'
-import { polygon } from '@reown/appkit/networks'
 import { createAppKit } from '@reown/appkit/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type ReactNode } from 'react'
@@ -27,7 +26,7 @@ const metadata = {
 const modal = createAppKit({
     adapters: [wagmiAdapter],
     projectId,
-    networks: [polygonAmoy, polygon],
+    networks: [polygonAmoy],
     defaultNetwork: polygonAmoy,
     metadata: metadata,
     features: {

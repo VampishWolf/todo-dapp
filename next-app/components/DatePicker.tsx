@@ -13,12 +13,15 @@ import {
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
-export function DatePicker({ handleOnChange }: { handleOnChange: any }) {
-    const [date, setDate] = useState<Date>()
+export function DatePicker(
+    { handleOnChange, selectedDate }:
+        { handleOnChange: (args: { name: string, value: string }) => void, selectedDate: string }) {
+
+    const formattedDate = selectedDate ? new Date(format(selectedDate, 'yyyy-MM-dd')) : new Date()
+    const [date, setDate] = useState<Date>(formattedDate)
 
     useEffect(() => {
         if (date) {
-            console.log(date)
             handleOnChange({ name: 'dueDate', value: format(date, "yyyy-MM-dd") })
         }
     }, [date])
@@ -44,7 +47,7 @@ export function DatePicker({ handleOnChange }: { handleOnChange: any }) {
                 <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(day) => day && setDate(day)}
                     initialFocus
                 />
             </PopoverContent>

@@ -16,7 +16,22 @@ export const mintNft = () => {
       address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
       functionName: 'mint',
     })
-    console.log(res, 'minted')
+
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const burnNft = () => {
+  try {
+    const { writeContract } = useWriteContract()
+    const res = writeContract({
+      abi: erc721Abi.abi,
+      address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
+      functionName: 'burn',
+      args: [55]
+    })
+    console.log(res, 'burned')
   } catch (error) {
     console.error(error)
   }
