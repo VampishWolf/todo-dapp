@@ -13,11 +13,3 @@ export const publicClient = createPublicClient({
     chain: polygonAmoy,
     transport: http()
 })
-
-// export const walletClient = createWalletClient({
-//     chain: polygonAmoy,
-//     transport: custom(window.ethereum)
-// })
-
-// // JSON-RPC Account
-// export const [account] = await walletClient.getAddresses()
