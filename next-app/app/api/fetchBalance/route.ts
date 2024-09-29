@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
     try {
         const erc20Balance = await publicClient.readContract({
-            address: '0x24C1d8547E251a49c6CdEc9A811E7d3c509228B1',
+            address: '0xf02f35bf1c8d2c3a1e7255fd9addc8f2182e0627',
             abi: erc20Abi.abi,
             functionName: 'balanceOf',
             args: [
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
         });
         console.log(erc20Balance, erc721Balance, 'balance');
 
-        return NextResponse.json({ erc20Bal: formatUnits(erc20Balance as bigint, 18) || '00', erc721Bal: String(erc721Balance) }, { status: 200 });
+        return NextResponse.json({ erc20Bal: Number(formatUnits(erc20Balance as bigint, 18)).toFixed(3) || '00', erc721Bal: String(erc721Balance) }, { status: 200 });
     } catch (error) {
         console.log(error);
         return NextResponse.json({ errorw: 'Failed to fetch balance', error }, { status: 500 });
