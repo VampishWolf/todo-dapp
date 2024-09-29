@@ -36,9 +36,9 @@ export const createToDo = async (obj: IToDo) => {
 
 }
 
-export const updateToDo = async (id: string, obj: IToDo) => {
+export const updateToDo = async (id: string, obj: IToDo, completed?: boolean) => {
     try {
-        obj.completed = false
+        completed ? obj.completed = true : obj.completed = false
         console.log(id, obj)
         const res = await axios.put(`${process.env.BACKEND_API_BASE_URL}/api/v1/todos/${id}`, obj);
 

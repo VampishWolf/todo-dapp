@@ -1,7 +1,8 @@
 'use client'
 
 import { deleteToDo, fetchToDos, IToDo, updateToDo } from '@/actions/todoCrud';
-import { CheckCircle, ListTodo } from 'lucide-react'; // Importing CheckCircle
+import { cn } from '@/lib/utils';
+import { CheckCircle, ListTodo, Trash2 } from 'lucide-react'; // Importing CheckCircle
 import { useState } from 'react';
 import TodoContainer from './TodoContainer';
 import { Button } from './ui/button';
@@ -15,10 +16,6 @@ interface ToDoData {
 }
 
 export default function TodosList({ todos, setTodos }: { todos: IToDo[], setTodos: any }) {
-    const handleDelete = (id: string) => {
-        deleteToDo(id);
-        setTodos((prevTodos: any[]) => prevTodos.filter((todo: { id: string; }) => todo.id !== id));
-    };
 
     return (
         <section>
@@ -29,7 +26,7 @@ export default function TodosList({ todos, setTodos }: { todos: IToDo[], setTodo
             <div className="flex flex-col-reverse">
                 {todos?.length ? todos.map((todo: IToDo) => (
                     <div key={todo.id} className='relative cursor-pointer'>
-                        <UpdateDialog todo={todo} handleDelete={handleDelete} setTodos={setTodos} />
+                        <UpdateDialog todo={todo} setTodos={setTodos} />
                     </div>
                 )) : <p>No Todos yet! Dobi is free</p>}
             </div>
@@ -37,7 +34,7 @@ export default function TodosList({ todos, setTodos }: { todos: IToDo[], setTodo
     );
 }
 
-const UpdateDialog = ({ todo, handleDelete, setTodos }: { todo: IToDo, handleDelete: (id: string) => void, setTodos: any }) => {
+const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [todoData, setTodoData] = useState<ToDoData>({
         title: todo.title,
@@ -55,6 +52,27 @@ const UpdateDialog = ({ todo, handleDelete, setTodos }: { todo: IToDo, handleDel
 
     const handleClose = () => {
         setIsOpen(false);
+    };
+
+    const handleDelete = (id: string) => {
+        deleteToDo(id);
+        setTodos((prevTodos: any[]) => prevTodos.filter((todo: { id: string; }) => todo.id !== id));
+    };
+
+    const handleComplete = async (event: React.MouseEvent, id: string) => {
+        event.stopPropagation(); // Prevent event from opening the dialog
+        if (todo.completed) return;
+
+        await updateToDo(id, {
+            title: todoData.title,
+            description: todoData.description,
+            dueDate: todoData.dueDate,
+            priority: todoData.priority
+        }, true);
+
+        // Refetch the updated todos list
+        const updatedTodos = await fetchToDos();
+        setTodos(updatedTodos.todos.data); // Update the todos state with new data
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }) => {
@@ -79,7 +97,6 @@ const UpdateDialog = ({ todo, handleDelete, setTodos }: { todo: IToDo, handleDel
 
             // Refetch the updated todos list
             const updatedTodos = await fetchToDos();
-            // console.log(updatedTodos, 'updatedTodos');
             setTodos(updatedTodos.todos.data); // Update the todos state with new data
 
             // After 2 seconds, close the dialog
@@ -95,9 +112,12 @@ const UpdateDialog = ({ todo, handleDelete, setTodos }: { todo: IToDo, handleDel
     return (
         <div>
             <div onClick={handleOpen}>
-                <div className="rounded-xl bg-white relative z-10 border-black border-1 p-2 text-sm">{todo.title}</div>
+                {/* Add stopPropagation to prevent the dialog from opening on CheckCircle click */}
+                <CheckCircle height={16} width={16} className={cn(`absolute bottom-[30px] left-[10px] z-20 cursor-pointer`, todo.completed && 'text-green-500')}
+                    onClick={(event) => handleComplete(event, todo.id!)} />
+                <div className="rounded-xl bg-white relative z-10 border-black border-1 p-2 text-sm pl-10">{todo.title}</div>
                 <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
-                <CheckCircle height={18} width={18} className="absolute float-right bottom-[30px] right-[10px] z-20 cursor-pointer" onClick={() => handleDelete(todo.id!)} />
+                <Trash2 height={16} width={16} className="absolute float-right bottom-[30px] right-[10px] z-20 cursor-pointer" onClick={() => handleDelete(todo.id!)} />
             </div>
             <Dialog isOpen={isOpen} onClose={handleClose} title="Update Todoo">
                 <TodoContainer todoData={todoData} handleChange={handleChange} />

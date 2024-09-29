@@ -31,7 +31,7 @@ const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children }) => 
 
   return (
     <div
-      className="z-20 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      className="z-30 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       onClick={onClose}
     >
       <div
