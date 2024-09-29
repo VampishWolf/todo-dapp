@@ -6,8 +6,9 @@ import Header from "@/components/Header";
 import TodosList from "@/components/TodosList";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from 'react';
-import { useWriteContract } from "wagmi";
+import { useAppKit } from "@reown/appkit/react";
+import { Suspense, useEffect, useState } from 'react';
+import { useAccount, useWriteContract } from "wagmi";
 import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 
 export default function Home() {
@@ -15,6 +16,9 @@ export default function Home() {
   const [isMinting, setIsMinting] = useState<boolean>(false);
   const { toast } = useToast()
   const { writeContract } = useWriteContract()
+
+  const { isConnected } = useAccount()
+  const { open, close } = useAppKit()
 
   // Fetch todos on component mount
   useEffect(() => {
@@ -68,12 +72,29 @@ export default function Home() {
     }
   }
 
+  if (!isConnected) {
+    return (
+      <div className="font-geistSans relative flex flex-col gap-4 items-center justify-center h-full">
+        <section className="flex flex-col items-center justify-center">
+          <h1 className="font-sylvia text-[140px] leading-[140px]">ToDoos</h1>
+          <p >A special place which can hold all your ToDoos safely and also give you a chance to earn NFT and Tokens.</p>
+        </section>
+        {/* <Image src="../..." alt="checklist" width={800} height={400} /> */}
+        <Button variant="default" onClick={() => open()}>
+          Connect Wallet
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <>
       <Header />
       <div className="m-6">
         <CreateToDo setTodos={setTodos} />
-        <TodosList todos={todos} setTodos={setTodos} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <TodosList todos={todos} setTodos={setTodos} />
+        </Suspense>
         <section className="flex gap-4 justify-end">
           <Button variant="outline" className="rounded-xl" onClick={burnNft}>Burn</Button>
           <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting}>{isMinting ? "Minting..." : "Mint"}</Button>

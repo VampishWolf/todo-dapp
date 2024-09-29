@@ -26,9 +26,8 @@ function Header() {
                     </Button>
                 </div>
                 )
-                : <Button variant="default" onClick={() => open()}>
-                    Connect Wallet
-                </Button>}
+                : null
+            }
         </div>
     )
 }

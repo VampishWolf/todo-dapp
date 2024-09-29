@@ -11,9 +11,16 @@ const geistSans = localFont({
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
+  weight: "100 900",
+});
+
+const sylviaAngel = localFont({
+  src: "./fonts/SylviaAngel.otf",
+  variable: "--font-sylvia-angel",
   weight: "100 900",
 });
 
@@ -32,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f8f7f4] max-w-[1020px] m-auto border-x-black border-x-2 h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${sylviaAngel.variable} antialiased bg-[#f8f7f4] max-w-[1020px] m-auto border-x-black border-x-2 h-screen`}
       >
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
       </body>
