@@ -2,7 +2,7 @@
 
 import { deleteToDo, fetchToDos, IToDo, updateToDo } from '@/actions/todoCrud';
 import { cn } from '@/lib/utils';
-import { CheckCircle, ListTodo, Trash2 } from 'lucide-react'; // Importing CheckCircle
+import { CheckCircle, Trash2 } from 'lucide-react'; // Importing CheckCircle
 import { useState } from 'react';
 import TodoContainer from './TodoContainer';
 import { Button } from './ui/button';
@@ -18,19 +18,13 @@ interface ToDoData {
 export default function TodosList({ todos, setTodos }: { todos: IToDo[], setTodos: any }) {
 
     return (
-        <section>
-            <div className="flex gap-2 items-center border-b-1 border-slate-500 mt-8 mb-5 pb-4">
-                <ListTodo height={22} width={22} />
-                <h3 className="font-bold text-2xl">Saved ToDoos ({todos?.length})</h3>
-            </div>
-            <div className="flex flex-col-reverse">
-                {todos?.length ? todos.map((todo: IToDo) => (
-                    <div key={todo.id} className='relative cursor-pointer'>
-                        <UpdateDialog todo={todo} setTodos={setTodos} />
-                    </div>
-                )) : <p>No Todos yet! Dobi is free</p>}
-            </div>
-        </section>
+        <div className="flex flex-col-reverse">
+            {todos?.length ? todos.map((todo: IToDo) => (
+                <div key={todo.id} className='relative cursor-pointer'>
+                    <UpdateDialog todo={todo} setTodos={setTodos} />
+                </div>
+            )) : <p>No Todos yet! Dobi is free</p>}
+        </div>
     );
 }
 
