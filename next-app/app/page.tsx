@@ -7,19 +7,21 @@ import NftsList from "@/components/NftsList";
 import TodosList from "@/components/TodosList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { useAppKit } from "@reown/appkit/react";
 import { ListTodo } from "lucide-react";
 import { useEffect, useState } from 'react';
+import { toast } from "sonner";
 import { useAccount, useDisconnect, useSignMessage, useWriteContract } from "wagmi";
 import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 
 export default function Home() {
   const [todos, setTodos] = useState([]);
+  const [completedTodos, setCompletedTodos] = useState<number>(0);
   const [isMinting, setIsMinting] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
-  const { toast } = useToast();
   const { writeContract } = useWriteContract();
+
+
 
   const { isConnected, isConnecting, isDisconnected } = useAccount();
   const { open } = useAppKit();
@@ -33,10 +35,17 @@ export default function Home() {
       if (data.success) {
         setTodos(data.todos.data);
       }
+
       setLoading(false); // End loading
     };
     getTodos();
   }, []);
+
+  useEffect(() => {
+    setCompletedTodos(todos.filter((todo: { completed: boolean; }) => todo.completed).length);
+    console.log(completedTodos, todos, 'aewq')
+  }, [todos])
+
 
   useEffect(() => {
     const signViaWallet = () => {
@@ -53,25 +62,32 @@ export default function Home() {
   }, [isConnected]);
 
 
-  const mintNft = () => {
+  const mintNft = async () => {
     setIsMinting(true);
+
+    if (completedTodos < 2) {
+      toast("Complete more Todos!", {
+        description: "You need at least 2 completed todos to mint an NFT",
+      })
+
+      setIsMinting(false);
+      return
+    }
     try {
-      const tx = writeContract({
+      const tx = await writeContract({
         abi: erc721Abi,
         address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
         functionName: 'mint',
-      });
+      })
 
-      toast({
-        title: "NFT Minted!",
+      toast("NFT Minted!", {
         description: "You just earned an NFT!",
-      });
+      })
     } catch (error) {
       console.error(error);
-      toast({
-        title: "Something went wrong",
+      toast("Something went wrong", {
         description: error as string,
-      });
+      })
     } finally {
       setIsMinting(false);
     }
@@ -103,14 +119,19 @@ export default function Home() {
           <ListTodo height={22} width={22} />
           <h3 className="font-bold text-2xl">Saved ToDoos ({todos?.length})</h3>
         </div>
-        {loading ? (
-          <div>Loading...</div> // Show loading indicator
-        ) : (
-          <TodosList todos={todos} setTodos={setTodos} />
-        )}
+        <div className="my-4">
+          {loading ? (
+            <div className="flex flex-col gap-4">
+              {/* Show loading indicator */}
+              {[1, 2, 3].map((item) => <Skeleton key={item} className='w-full h-12' />)}
+            </div>
+          ) : (
+            <TodosList todos={todos} setTodos={setTodos} />
+          )}
+        </div>
         <section className="flex gap-4 justify-end items-center">
-          <p>You finish two ToDoos to mint an NFT.</p>
-          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting}>
+          <p className="text-md">You finish two ToDoos to mint an NFT.</p>
+          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting || completedTodos < 2}>
             {/* Fix this isMinting */}
             {isMinting ? "Minting..." : "Mint"}
           </Button>

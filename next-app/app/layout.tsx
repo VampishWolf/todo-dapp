@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 
+import { Toaster } from '@/components/ui/sonner';
 import { ReactNode } from "react";
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${sylviaAngel.variable} antialiased bg-[#f8f7f4] max-w-[1020px] mx-auto border-x-black border-x-2 min-h-lvh`}
       >
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -47,7 +47,7 @@ function CreateToDo({ setTodos }: { setTodos: any }) {
 
     return (
         <>
-            <div className="flex gap-2 items-center border-b-1 border-slate-500 my-2">
+            <div className="flex gap-2 items-center border-b-1 border-slate-500 my-4">
                 <PlusCircle height={22} width={22} />
                 <h3 className="my-3 font-bold text-2xl">Add ToDoos</h3>
             </div>

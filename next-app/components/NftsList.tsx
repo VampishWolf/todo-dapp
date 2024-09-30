@@ -52,7 +52,7 @@ function NftsList() {
             </div> :
                 <div className='flex gap-4'>
                     {balance?.tokenIds.map((item, index) =>
-                        <div className='relative'>
+                        <div className='relative' key={index}>
                             <div className='z-10 relative w-[230px] h-[60px] bg-white rounded-xl border-1 border-black flex items-center justify-between p-3' key={index}>
                                 <p>Nft Id: {item}</p>
                                 <Button variant="default" className="flex justify-between rounded-xl gap-3" onClick={() => burnNft(item)}>
