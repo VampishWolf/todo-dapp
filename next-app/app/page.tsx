@@ -6,27 +6,25 @@ import Header from "@/components/Header";
 import NftsList from "@/components/NftsList";
 import TodosList from "@/components/TodosList";
 import { Button } from "@/components/ui/button";
+import Dialog from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppKit } from "@reown/appkit/react";
-import { ListTodo } from "lucide-react";
+import { CheckCheck, ListTodo, Loader2Icon } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { toast } from "sonner";
-import { useAccount, useDisconnect, useSignMessage, useWriteContract } from "wagmi";
+import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 
 export default function Home() {
   const [todos, setTodos] = useState([]);
   const [completedTodos, setCompletedTodos] = useState<number>(0);
-  const [isMinting, setIsMinting] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
-  const { writeContract } = useWriteContract();
-
-
+  const { data: hash, isPending, writeContract } = useWriteContract();
 
   const { isConnected, isConnecting, isDisconnected } = useAccount();
   const { open } = useAppKit();
   const { signMessage } = useSignMessage()
-  const { disconnect } = useDisconnect();
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const getTodos = async () => {
@@ -61,37 +59,46 @@ export default function Home() {
     signViaWallet()
   }, [isConnected]);
 
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
 
   const mintNft = async () => {
-    setIsMinting(true);
-
     if (completedTodos < 2) {
       toast("Complete more Todos!", {
         description: "You need at least 2 completed todos to mint an NFT",
       })
-
-      setIsMinting(false);
       return
     }
     try {
-      const tx = await writeContract({
+      writeContract({
         abi: erc721Abi,
         address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
         functionName: 'mint',
       })
-
-      toast("NFT Minted!", {
-        description: "You just earned an NFT!",
-      })
     } catch (error) {
-      console.error(error);
+      console.error(error, 'qeq');
       toast("Something went wrong", {
         description: error as string,
       })
-    } finally {
-      setIsMinting(false);
     }
   };
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: hash,
+    })
+
+  useEffect(() => {
+    if (hash && isConfirming) {
+      setIsOpen(true)
+    } else if (isConfirmed) {
+      toast("NFT Minted!", {
+        description: "You just earned an NFT!",
+      })
+    }
+  }, [isConfirming, isConfirmed])
 
   if (!isConnected) {
     return (
@@ -131,14 +138,30 @@ export default function Home() {
         </div>
         <section className="flex gap-4 justify-end items-center">
           <p className="text-md">You finish two ToDoos to mint an NFT.</p>
-          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting || completedTodos < 2}>
-            {/* Fix this isMinting */}
-            {isMinting ? "Minting..." : "Mint"}
+          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isPending || completedTodos < 2}>
+            {isPending ? "Minting..." : "Mint"}
           </Button>
         </section>
+        <Dialog isOpen={isOpen} onClose={handleClose} title="Congratulations!">
+          <div className="text-center p-6 gap-4 flex flex-col items-center">
+            {hash && isConfirming && !isConfirmed ? (
+              <>
+                <h4 className="text-2xl font-bold">Your NFT is on its way</h4>
+                <p>Mint in progress...</p>
+                <Loader2Icon className="animate-spin" size={32} />
+              </>
+            ) : (
+              <>
+                <h4 className="text-2xl font-bold">Hooray, You earned it</h4>
+                <p>NFT minted!</p>
+                <CheckCheck className="animate-bounce text-green-600" size={32} />
+              </>
+            )}
+          </div>
+        </Dialog>
         <section>
           {/* NFTs to be shown with burn option */}
-          <NftsList />
+          <NftsList isConfirmed={isConfirmed} />
         </section>
       </div>
     </>

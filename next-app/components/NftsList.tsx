@@ -1,35 +1,31 @@
 import axios from 'axios';
 import { ListTodo, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { toast } from 'sonner';
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 
-function NftsList() {
-    const { address, isConnected, isConnecting } = useAccount()
-    const [balance, setBalance] = useState<{ totalCount: number; tokenIds: number[] }>({
-        totalCount: 0,
-        tokenIds: []
-    });
-    const [loading, setLoading] = useState<boolean>(true);
-    const { writeContract } = useWriteContract();
+function NftsCard({ item, index, refreshList }: { item: number, index: number, refreshList: () => void }) {
+    const { data: hash, isPending, writeContract } = useWriteContract();
+    const { isLoading: isConfirming, isSuccess: isConfirmed } =
+        useWaitForTransactionReceipt({
+            hash: hash,
+        })
 
     useEffect(() => {
-        if (isConnected) {
-            const fetchNfts = async () => {
-                const response = await axios.get('/api/fetchErc721Balance', { params: { userAddress: address } });
-                setBalance({ totalCount: response.data.result.length, tokenIds: response.data.result.map((item: any) => parseInt(item.token_id, 10)) });
-                setLoading(false);
-            }
-            fetchNfts();
+        if (isConfirmed) {
+            refreshList()
+            toast("NFT Burned!", {
+                description: "You just earned some tokens!",
+            })
         }
-    }, [address])
+    }, [isConfirming, isConfirmed])
 
-    const burnNft = async (id: number) => {
-
+    const handleBurn = async (id: number) => {
         try {
-            const tx = writeContract({
+            writeContract({
                 abi: erc721Abi,
                 address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
                 functionName: 'burn',
@@ -40,6 +36,53 @@ function NftsList() {
         }
     };
 
+    return (
+        <>
+            <div className='relative' key={index}>
+                <div className='z-10 relative w-[230px] h-[60px] bg-white rounded-xl border-1 border-black flex items-center justify-between p-3' key={index}>
+                    <p>Nft Id: {item}</p>
+                    <Button variant="default" className="flex justify-between rounded-xl gap-3" onClick={() => handleBurn(item)} disabled={isPending || hash && isConfirming && !isConfirmed}>
+                        <span>{(isPending || hash && isConfirming && !isConfirmed) ? 'Burning...' : 'Burn'}</span>
+                        <Trash2Icon height={14} width={14} />
+                    </Button>
+                </div>
+                <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
+            </div></>
+    )
+}
+
+function NftsList({ isConfirmed: mintConfirmed }: { isConfirmed: boolean }) {
+    const { address, isConnected } = useAccount()
+    const [balance, setBalance] = useState<{ totalCount: number; tokenIds: number[] }>({
+        totalCount: 0,
+        tokenIds: []
+    });
+    const [loading, setLoading] = useState<boolean>(true);
+
+
+    const fetchNfts = async () => {
+        console.log('called fetchNfts')
+        const response = await axios.get('/api/fetchErc721Balance', { params: { userAddress: address }, headers: { 'Cache-Control': 'no-store' } });
+        setBalance({ totalCount: response.data.result.length, tokenIds: response.data.result.map((item: any) => parseInt(item.token_id, 10)) });
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        if (isConnected) {
+            fetchNfts();
+        }
+    }, [address])
+
+    // Refetch NFTs when isConfirmed is true
+    useEffect(() => {
+        console.log(mintConfirmed, 'mintConfirmed')
+        if (mintConfirmed) {
+            const timer = setTimeout(() => fetchNfts(), 2000);
+
+            // Cleanup the timer when the component unmounts or isConfirmed changes
+            return () => clearTimeout(timer);
+        }
+    }, [mintConfirmed]);
 
     return (
         <>
@@ -50,18 +93,9 @@ function NftsList() {
             {loading ? <div className='flex gap-4'>
                 {[1, 2, 3].map((item) => <Skeleton key={item} className='w-[230px] h-[60px]' />)}
             </div> :
-                <div className='flex gap-4'>
+                <div className='flex gap-4 flex-wrap'>
                     {balance?.tokenIds.map((item, index) =>
-                        <div className='relative' key={index}>
-                            <div className='z-10 relative w-[230px] h-[60px] bg-white rounded-xl border-1 border-black flex items-center justify-between p-3' key={index}>
-                                <p>Nft Id: {item}</p>
-                                <Button variant="default" className="flex justify-between rounded-xl gap-3" onClick={() => burnNft(item)}>
-                                    <span>Burn</span>
-                                    <Trash2Icon height={14} width={14} />
-                                </Button>
-                            </div>
-                            <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
-                        </div>
+                        <NftsCard key={index} item={item} index={index} refreshList={fetchNfts} />
                     )}
                 </div>
             }

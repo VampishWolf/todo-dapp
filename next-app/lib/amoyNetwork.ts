@@ -20,7 +20,7 @@ export const polygonAmoy: CaipNetwork = {
     name: 'Amoy Testnet',
     currency: 'POL',
     explorerUrl: 'https://amoy.polygonscan.com/',
-    rpcUrl: 'https://polygon-amoy.drpc.org',
+    rpcUrl: 'https://rpc.ankr.com/polygon_amoy',
     imageUrl: 'https://uk.pinterest.com/pin/polygon-logo-matic-token--268456827780023387/',
     imageId: ''
 }

@@ -32,7 +32,12 @@ function CreateToDo({ setTodos }: { setTodos: any }) {
     };
 
     const createEntry = async () => {
-        console.log(todoData)
+        if (!todoData.title || !todoData.description) {
+            toast("Careful, you missed something!", {
+                description: "Todoo need words to be defined.",
+            })
+            return
+        }
         await createToDo({
             title: todoData.title,
             description: todoData.description,
