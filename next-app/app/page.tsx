@@ -3,6 +3,7 @@
 import { fetchToDos } from "@/actions/todoCrud";
 import CreateToDo from "@/components/CreateToDo";
 import Header from "@/components/Header";
+import NftsList from "@/components/NftsList";
 import TodosList from "@/components/TodosList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -76,23 +77,6 @@ export default function Home() {
     }
   };
 
-  const burnNft = async () => {
-    try {
-      const request = writeContract({
-        abi: erc721Abi,
-        address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
-        functionName: 'burn',
-        args: [54]
-      });
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Something went wrong",
-        description: error as string,
-      });
-    }
-  };
-
   if (!isConnected) {
     return (
       <div className="font-geistSans relative flex flex-col gap-4 items-center justify-center h-full p-[25%]">
@@ -125,19 +109,13 @@ export default function Home() {
           <TodosList todos={todos} setTodos={setTodos} />
         )}
         <section className="flex gap-4 justify-end">
-          <Button variant="outline" className="rounded-xl" onClick={burnNft}>Burn</Button>
           <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting}>
             {isMinting ? "Minting..." : "Mint"}
           </Button>
         </section>
         <section>
-          <div className="flex gap-2 items-center border-b-1 border-slate-500 mt-8 mb-5 pb-4">
-            <ListTodo height={22} width={22} />
-            <h3 className="font-bold text-2xl">NFTs Minted</h3>
-          </div>
-          <div>
-            {/* NFTs to be shown with burn option */}
-          </div>
+          {/* NFTs to be shown with burn option */}
+          <NftsList />
         </section>
       </div>
     </>

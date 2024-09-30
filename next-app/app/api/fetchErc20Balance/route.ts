@@ -21,7 +21,7 @@ export async function GET(req: Request) {
                 userAddress
             ]
         });
-        // 0x41B073e1478E53A66ba6F8B90094Ae28FB9c9238
+
         const erc721Balance = await publicClient.readContract({
             address: '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46',
             abi: erc721Abi,

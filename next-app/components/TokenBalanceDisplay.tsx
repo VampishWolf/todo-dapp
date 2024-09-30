@@ -13,7 +13,7 @@ const TokenBalanceDisplay: React.FC<{ userAddress: `0x${string}` }> = ({ userAdd
 
     useEffect(() => {
         const fetchBalance = async () => {
-            const result = await axios.get('/api/fetchBalance', { params: { userAddress } });
+            const result = await axios.get('/api/fetchErc20Balance', { params: { userAddress } });
             // console.debug(result.data, '1qwedeqw');
             setBalance({ erc20Bal: result.data.erc20Bal, erc721Bal: result.data.erc721Bal });
             setLoading(false);
