@@ -4,6 +4,7 @@ import { deleteToDo, fetchToDos, IToDo, updateToDo } from '@/actions/todoCrud';
 import { cn } from '@/lib/utils';
 import { CheckCircle, Trash2 } from 'lucide-react'; // Importing CheckCircle
 import { useState } from 'react';
+import { toast } from 'sonner';
 import TodoContainer from './TodoContainer';
 import { Button } from './ui/button';
 import Dialog from './ui/dialog';
@@ -40,6 +41,12 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
     const [updateSuccess, setUpdateSuccess] = useState(false); // For showing "Updated"
 
     const handleOpen = () => {
+        if (todo.completed) {
+            toast("History can't be rewritten!", {
+                description: "Completed tasks can't be edited.",
+            })
+            return
+        }
         setIsOpen(true);
         setUpdateSuccess(false); // Reset success message when reopening dialog
     };
@@ -48,9 +55,19 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
         setIsOpen(false);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (event: React.MouseEvent, id: string) => {
+        event.stopPropagation()
         deleteToDo(id);
         setTodos((prevTodos: any[]) => prevTodos.filter((todo: { id: string; }) => todo.id !== id));
+        if (todo.completed) {
+            toast("Voila, Erased!", {
+                description: "Made space for some new Todoos.",
+            })
+        } else {
+            toast("Meh, Removed!", {
+                description: "You just deleted a ToDoo.",
+            })
+        }
     };
 
     const handleComplete = async (event: React.MouseEvent, id: string) => {
@@ -64,6 +81,9 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
             priority: todoData.priority
         }, true);
 
+        toast("Whoa, you crushed!", {
+            description: "A todoo was marked as completed.",
+        })
         // Refetch the updated todos list
         const updatedTodos = await fetchToDos();
         setTodos(updatedTodos.todos.data); // Update the todos state with new data
@@ -111,7 +131,7 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
                     onClick={(event) => handleComplete(event, todo.id!)} />
                 <div className="rounded-xl bg-white relative z-10 border-black border-1 p-2 text-sm pl-10">{todo.title}</div>
                 <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
-                <Trash2 height={16} width={16} className="absolute float-right bottom-[30px] right-[10px] z-20 cursor-pointer" onClick={() => handleDelete(todo.id!)} />
+                <Trash2 height={16} width={16} className="absolute float-right bottom-[30px] right-[10px] z-20 cursor-pointer" onClick={(event) => handleDelete(event, todo.id!)} />
             </div>
             <Dialog isOpen={isOpen} onClose={handleClose} title="Update Todoo">
                 <TodoContainer todoData={todoData} handleChange={handleChange} />

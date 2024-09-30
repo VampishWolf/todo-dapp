@@ -3,6 +3,7 @@
 import { createToDo, fetchToDos } from "@/actions/todoCrud"
 import { PlusCircle } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 import TodoContainer from "./TodoContainer"
 import { Button } from "./ui/button"
 
@@ -17,8 +18,8 @@ function CreateToDo({ setTodos }: { setTodos: any }) {
     const [todoData, setTodoData] = useState<ToDoData>({
         title: '',
         description: '',
-        dueDate: '',
-        priority: ''
+        dueDate: new Date().toISOString().slice(0, 10),
+        priority: 'low'
     });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }) => {
@@ -31,6 +32,7 @@ function CreateToDo({ setTodos }: { setTodos: any }) {
     };
 
     const createEntry = async () => {
+        console.log(todoData)
         await createToDo({
             title: todoData.title,
             description: todoData.description,
@@ -41,6 +43,9 @@ function CreateToDo({ setTodos }: { setTodos: any }) {
         // Refetch the todos list after creation
         const data = await fetchToDos();
         if (data.success) {
+            toast("Woohoo, created!", {
+                description: "You just created a Todoo.",
+            })
             setTodos(data.todos.data);
         }
     };
