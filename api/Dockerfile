@@ -12,13 +12,27 @@ COPY yarn.lock /usr/src/node-backend/yarn.lock
 # BUILD DEPS
 FROM base as build-deps
 RUN yarn
+
 COPY . /usr/src/node-backend
 WORKDIR /usr/src/node-backend
 RUN yarn build
+
+# Ensure to copy the Prisma schema
+COPY prisma/schema.prisma ./prisma/schema.prisma
+
+RUN npx prisma generate
 
 # START API
 FROM base as prod-stage
 COPY --from=build-deps /usr/src/node-backend/dist ./dist
 
 RUN yarn --production
+
+
+# Copy the Prisma schema again if needed in production stage
+COPY prisma/schema.prisma ./prisma/schema.prisma
+
+# Generate Prisma client again to ensure it's available in the production image
+RUN yarn prisma generate
+
 CMD ["yarn", "start"]
