@@ -97,7 +97,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="m-6">
+      <div className="m-6 font-geistSans">
         <CreateToDo setTodos={setTodos} />
         <div className="flex gap-2 items-center border-b-1 border-slate-500 mt-8 mb-5 pb-4">
           <ListTodo height={22} width={22} />
@@ -108,8 +108,10 @@ export default function Home() {
         ) : (
           <TodosList todos={todos} setTodos={setTodos} />
         )}
-        <section className="flex gap-4 justify-end">
+        <section className="flex gap-4 justify-end items-center">
+          <p>You finish two ToDoos to mint an NFT.</p>
           <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isMinting}>
+            {/* Fix this isMinting */}
             {isMinting ? "Minting..." : "Mint"}
           </Button>
         </section>

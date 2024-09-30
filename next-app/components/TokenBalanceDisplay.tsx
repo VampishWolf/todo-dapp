@@ -31,9 +31,11 @@ const TokenBalanceDisplay: React.FC<{ userAddress: `0x${string}` }> = ({ userAdd
     // }
 
     return (
-        <div className='flex gap-3'>
-            <p>ERC20: {balance.erc20Bal}</p>
-            <p>ERC721: {balance.erc721Bal}</p>
+        <div className='relative'>
+            <div className='z-10 relative bg-white rounded-xl border-1 border-black px-3 py-1'>
+                ERC20: {balance.erc20Bal}
+            </div>
+            <div className="absolute z-0 bg-black m-auto w-[93%] h-5 rounded-2xl -bottom-1 right-1"></div>
         </div>
     );
 };

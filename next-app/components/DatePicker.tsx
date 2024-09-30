@@ -40,7 +40,7 @@ export function DatePicker(
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {date ? format(date, "PPP") : <span>Pick a date</span>}
                     </Button>
-                    <div className="z-0 bg-black m-auto relative w-[94%] h-5 rounded-2xl bottom-4"></div>
+                    <div className="z-0 bg-black m-auto relative w-[96%] h-5 rounded-2xl bottom-4"></div>
                 </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">

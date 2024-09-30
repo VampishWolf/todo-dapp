@@ -11,7 +11,7 @@ function Header() {
 
 
     return (
-        <div className="p-5 mx-1 flex items-center justify-between text-black gap-4">
+        <div className="p-5 mx-1 flex items-center justify-between text-black gap-4 font-geistSans">
             <p className='font-extrabold text-xl'>ToDoo DApp</p>
             {/* Check if wallet is connected */}
             {isConnecting && <Button

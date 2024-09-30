@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ListTodo } from 'lucide-react';
+import { ListTodo, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAccount, useWriteContract } from 'wagmi';
 import erc721Abi from "../../smart-contracts/ERC721Abi.json";
@@ -48,14 +48,17 @@ function NftsList() {
                 <h3 className="font-bold text-2xl">NFTs Minted ({balance.totalCount})</h3>
             </div>
             {loading ? <div className='flex gap-4'>
-                {[1, 2, 3].map((item) => <Skeleton key={item} className='w-[200px] h-[60px]' />)}
+                {[1, 2, 3].map((item) => <Skeleton key={item} className='w-[230px] h-[60px]' />)}
             </div> :
                 <div className='flex gap-4'>
                     {balance?.tokenIds.map((item, index) =>
                         <div className='relative'>
-                            <div className='z-10 relative w-[200px] h-[60px] bg-white rounded-xl border-1 border-black flex items-center justify-between p-3' key={index}>
-                                <p>Nft Ids: {item}</p>
-                                <Button variant="default" className="rounded-xl" onClick={() => burnNft(item)}>Burn</Button>
+                            <div className='z-10 relative w-[230px] h-[60px] bg-white rounded-xl border-1 border-black flex items-center justify-between p-3' key={index}>
+                                <p>Nft Id: {item}</p>
+                                <Button variant="default" className="flex justify-between rounded-xl gap-3" onClick={() => burnNft(item)}>
+                                    <span>Burn</span>
+                                    <Trash2Icon height={14} width={14} />
+                                </Button>
                             </div>
                             <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
                         </div>
