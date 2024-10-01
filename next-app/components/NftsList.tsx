@@ -1,9 +1,9 @@
+import erc721Abi from "@/smart-contracts/ERC721Abi.json";
 import axios from 'axios';
 import { ListTodo, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 

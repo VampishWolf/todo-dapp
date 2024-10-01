@@ -8,12 +8,12 @@ import TodosList from "@/components/TodosList";
 import { Button } from "@/components/ui/button";
 import Dialog from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import erc721Abi from "@/smart-contracts/ERC721Abi.json";
 import { useAppKit } from "@reown/appkit/react";
 import { CheckCheck, ListTodo, Loader2Icon } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { toast } from "sonner";
 import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import erc721Abi from "../../smart-contracts/ERC721Abi.json";
 
 export default function Home() {
   const [todos, setTodos] = useState([]);
@@ -103,16 +103,15 @@ export default function Home() {
   if (!isConnected) {
     return (
       <div className="font-geistSans relative flex flex-col gap-4 items-center justify-center h-full p-[25%]">
-        <section className="flex flex-col items-center justify-center">
+        <section className="flex flex-col items-center justify-center text-center">
           <h1 className="font-sylvia text-[140px] leading-[140px]">ToDoos</h1>
           <p>A special place which can hold all your ToDoos safely and also give you a chance to earn NFT and Tokens.</p>
         </section>
-        {isDisconnected ?
-          <Button variant="default" onClick={() => open()}>
-            Connect Wallet
-          </Button>
-          : <Skeleton className="w-[133px] h-9 rounded-lg bg-zinc-600" />
-        }
+
+        <Button variant="default" onClick={() => open()}>
+          Connect Wallet
+        </Button>
+
       </div>
     );
   }

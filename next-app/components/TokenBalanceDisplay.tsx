@@ -2,6 +2,8 @@
 
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { Skeleton } from './ui/skeleton';
 
 
 const TokenBalanceDisplay: React.FC<{ userAddress: `0x${string}` }> = ({ userAddress }) => {
@@ -10,27 +12,36 @@ const TokenBalanceDisplay: React.FC<{ userAddress: `0x${string}` }> = ({ userAdd
         erc721Bal: 0
     });
     const [loading, setLoading] = useState<boolean>(true);
+    const { address, isConnected } = useAccount()
+
+    const fetchBalance = async () => {
+        const result = await axios.get('/api/fetchErc20Balance', { params: { userAddress }, headers: { 'Cache-Control': 'no-store' } });
+        setBalance({ erc20Bal: result.data.erc20Bal, erc721Bal: result.data.erc721Bal });
+        setLoading(false);
+    };
 
     useEffect(() => {
-        const fetchBalance = async () => {
-            const result = await axios.get('/api/fetchErc20Balance', { params: { userAddress }, headers: { 'Cache-Control': 'no-store' } });
-            setBalance({ erc20Bal: result.data.erc20Bal, erc721Bal: result.data.erc721Bal });
-            setLoading(false);
-        };
         fetchBalance();
     }, []);
 
+    useEffect(() => {
+        if (isConnected) {
+            fetchBalance();
+        }
+    }, [address])
 
-    if (loading) {
-        return <div>Loading balance...</div>;
-    }
 
     return (
         <div className='relative'>
-            <div className='z-10 relative bg-white rounded-xl border-1 border-black px-3 py-1'>
-                Balance: {balance.erc20Bal}
-            </div>
-            <div className="absolute z-0 bg-black m-auto w-[93%] h-5 rounded-2xl -bottom-1 right-1"></div>
+            {loading ?
+                <Skeleton className='h-9 w-32 relative rounded-lg ' />
+                : <>
+                    <div className='z-10 relative bg-white rounded-xl border-1 border-black px-3 py-1'>
+                        Balance: {balance.erc20Bal}
+                    </div>
+                    <div className="absolute z-0 bg-black m-auto w-[93%] h-5 rounded-2xl -bottom-1 right-1"></div>
+                </>
+            }
         </div>
     );
 };

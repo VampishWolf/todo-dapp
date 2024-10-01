@@ -1,8 +1,8 @@
 import { publicClient } from '@/lib/viemClient';
+import erc20Abi from '@/smart-contracts/ERC20-ABI.json';
+import erc721Abi from '@/smart-contracts/ERC721Abi.json';
 import { NextResponse } from 'next/server';
 import { formatUnits } from 'viem';
-import erc20Abi from '../../../../smart-contracts/ERC20-ABI.json';
-import erc721Abi from '../../../../smart-contracts/ERC721Abi.json';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);

@@ -25,7 +25,7 @@ if (!projectId) {
 const metadata = {
     name: "ToDoo DAoo",
     description: "A place for all your ToDoos",
-    url: "https://scrollapp.com", // origin must match your domain & subdomain
+    url: "http://localhost:3000/", // origin must match your domain & subdomain
     icons: ["https://avatars.githubusercontent.com/u/179229932"]
 }
 
@@ -40,12 +40,6 @@ createAppKit({
         analytics: true, // Optional - defaults to your Cloud configuration
     },
     themeMode: 'dark',
-    tokens: {
-        80002: {
-            address: '0xf02f35bF1C8D2c3a1e7255FD9AddC8F2182e0627',
-            image: 'token_image_url' //optional
-        },
-    } as Tokens
 })
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
