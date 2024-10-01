@@ -1,27 +1,46 @@
+import useFetchNfts from '@/hooks/useFetchNfts'; // Import your custom hook
+import useTokenBalances from '@/hooks/useTokenBalances';
 import erc721Abi from "@/smart-contracts/ERC721Abi.json";
-import axios from 'axios';
 import { ListTodo, Trash2Icon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 
-function NftsCard({ item, index, refreshList }: { item: number, index: number, refreshList: () => void }) {
+function NftsCard({ item, index, fetchNfts }: { item: number; index: number; fetchNfts: () => void; }) {
     const { data: hash, isPending, writeContract } = useWriteContract();
-    const { isLoading: isConfirming, isSuccess: isConfirmed } =
-        useWaitForTransactionReceipt({
-            hash: hash,
-        })
+    const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: hash });
+    const { balances, loading, refetch } = useTokenBalances();
 
     useEffect(() => {
         if (isConfirmed) {
-            refreshList()
-            toast("NFT Burned!", {
-                description: "You just earned some tokens!",
-            })
+            let timeoutId: NodeJS.Timeout;
+
+            timeoutId = setTimeout(async () => {
+                // Fetch Balances after Burn
+                await refetch(); // Wait for fetchBalances to complete
+
+                // Fetch NFTs after Burn
+                fetchNfts();
+
+                toast("NFT Burned!", {
+                    description: "You just earned some tokens!",
+                });
+            }, 2500)
+
+            // Cleanup function to clear timeout on unmount
+            return () => {
+                clearTimeout(timeoutId);
+            };
         }
-    }, [isConfirming, isConfirmed])
+    }, [isConfirmed, refetch]);
+
+    // Log balances for debugging
+    useEffect(() => {
+        console.log('Token Balances:', balances);
+    }, [balances]);
+
 
     const handleBurn = async (id: number) => {
         try {
@@ -47,39 +66,29 @@ function NftsCard({ item, index, refreshList }: { item: number, index: number, r
                     </Button>
                 </div>
                 <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
-            </div></>
-    )
+            </div>
+        </>
+    );
 }
 
-function NftsList({ mintConfirmed }: { mintConfirmed: boolean }) {
-    const { address, isConnected } = useAccount()
-    const [balance, setBalance] = useState<{ totalCount: number; tokenIds: number[] }>({
-        totalCount: 0,
-        tokenIds: []
-    });
-    const [loading, setLoading] = useState<boolean>(true);
+function NftsList({ mintConfirmed }: { mintConfirmed: boolean; }) {
+    const { balance, loading, fetchNfts } = useFetchNfts(); // Use the custom hook
 
-
-    const fetchNfts = async () => {
-        console.log('called fetchNfts')
-        const response = await axios.get('/api/fetchErc721Balance', { params: { userAddress: address }, headers: { 'Cache-Control': 'no-store' } });
-        setBalance({ totalCount: response.data.result.length, tokenIds: response.data.result.map((item: any) => parseInt(item.token_id, 10)) });
-        setLoading(false);
-    }
-
+    // Fetch NFTs when mintConfirmed is true with a timeout
     useEffect(() => {
-        if (isConnected) {
-            fetchNfts();
-        }
-    }, [address])
+        let timeoutId: NodeJS.Timeout; // Type for Node.js timeout ID
 
-    // Refetch NFTs when isConfirmed is true
-    useEffect(() => {
-        console.log(mintConfirmed, 'mintConfirmed')
         if (mintConfirmed) {
-            fetchNfts()
+            timeoutId = setTimeout(() => {
+                fetchNfts();
+            }, 2500)
         }
-    }, [mintConfirmed]);
+
+        // Cleanup function to clear timeout on unmount
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [mintConfirmed])
 
     return (
         <>
@@ -87,17 +96,19 @@ function NftsList({ mintConfirmed }: { mintConfirmed: boolean }) {
                 <ListTodo height={22} width={22} />
                 <h3 className="font-bold text-2xl">NFTs Minted ({balance.totalCount})</h3>
             </div>
-            {loading ? <div className='flex gap-4'>
-                {[1, 2, 3].map((item) => <Skeleton key={item} className='w-[230px] h-[60px]' />)}
-            </div> :
+            {loading ? (
+                <div className='flex gap-4'>
+                    {[1, 2, 3, 4].map((item) => <Skeleton key={item} className='w-[230px] h-[60px]' />)}
+                </div>
+            ) : (
                 <div className='flex gap-4 flex-wrap'>
                     {balance?.tokenIds.map((item, index) =>
-                        <NftsCard key={index} item={item} index={index} refreshList={fetchNfts} />
+                        <NftsCard key={index} item={item} index={index} fetchNfts={fetchNfts} />
                     )}
                 </div>
-            }
+            )}
         </>
-    )
+    );
 }
 
-export default NftsList
+export default NftsList;
