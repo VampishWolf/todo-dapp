@@ -20,12 +20,12 @@ export default function Home() {
   const [completedTodos, setCompletedTodos] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const { data: hash, isPending, writeContract } = useWriteContract();
-
-  const { isConnected, isConnecting, isDisconnected } = useAccount();
+  const { isConnected } = useAccount();
   const { open } = useAppKit();
   const { signMessage } = useSignMessage()
   const [isOpen, setIsOpen] = useState(false);
 
+  // Fetch ToDos
   useEffect(() => {
     const getTodos = async () => {
       setLoading(true); // Start loading
@@ -33,36 +33,33 @@ export default function Home() {
       if (data.success) {
         setTodos(data.todos.data);
       }
-
       setLoading(false); // End loading
     };
     getTodos();
   }, []);
 
+  // Count completed todos
   useEffect(() => {
     setCompletedTodos(todos.filter((todo: { completed: boolean; }) => todo.completed).length);
-    console.log(completedTodos, todos, 'aewq')
   }, [todos])
 
-
+  // Sign message via wallet
   useEffect(() => {
     const signViaWallet = () => {
       if (isConnected) {
         try {
-          signMessage({ message: 'Welcome to ToDoos' });
+          signMessage({ message: `Welcome to ToDoos \nDate: ${new Date()}` });
         } catch (error) {
-          // disconnect(); // Disconnect if there's an error (e.g., user cancels)
           console.error("Error signing message:", error);
         }
       }
     }
     signViaWallet()
-  }, [isConnected]);
+  }, [isConnected])
 
   const handleClose = () => {
     setIsOpen(false);
   };
-
 
   const mintNft = async () => {
     if (completedTodos < 2) {
@@ -78,17 +75,18 @@ export default function Home() {
         functionName: 'mint',
       })
     } catch (error) {
-      console.error(error, 'qeq');
+      console.error(error)
       toast("Something went wrong", {
         description: error as string,
       })
     }
   };
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash: hash,
-    })
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    confirmations: 10,
+    hash,
+    onReplaced: replacement => console.log(replacement),
+  })
 
   useEffect(() => {
     if (hash && isConfirming) {
@@ -111,7 +109,6 @@ export default function Home() {
         <Button variant="default" onClick={() => open()}>
           Connect Wallet
         </Button>
-
       </div>
     );
   }
