@@ -51,7 +51,7 @@ function NftsCard({ item, index, refreshList }: { item: number, index: number, r
     )
 }
 
-function NftsList({ isConfirmed: mintConfirmed }: { isConfirmed: boolean }) {
+function NftsList({ mintConfirmed }: { mintConfirmed: boolean }) {
     const { address, isConnected } = useAccount()
     const [balance, setBalance] = useState<{ totalCount: number; tokenIds: number[] }>({
         totalCount: 0,
@@ -77,10 +77,7 @@ function NftsList({ isConfirmed: mintConfirmed }: { isConfirmed: boolean }) {
     useEffect(() => {
         console.log(mintConfirmed, 'mintConfirmed')
         if (mintConfirmed) {
-            const timer = setTimeout(() => fetchNfts(), 2000);
-
-            // Cleanup the timer when the component unmounts or isConfirmed changes
-            return () => clearTimeout(timer);
+            fetchNfts()
         }
     }, [mintConfirmed]);
 

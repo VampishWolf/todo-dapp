@@ -138,8 +138,8 @@ export default function Home() {
         </div>
         <section className="flex gap-4 justify-end items-center">
           <p className="text-md">You finish two ToDoos to mint an NFT.</p>
-          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isPending || completedTodos < 2}>
-            {isPending ? "Minting..." : "Mint"}
+          <Button variant="default" className="w-28 rounded-xl" onClick={mintNft} disabled={isPending || completedTodos < 2 || hash && isConfirming && !isConfirmed}>
+            {isPending || hash && isConfirming && !isConfirmed ? "Minting..." : "Mint"}
           </Button>
         </section>
         <Dialog isOpen={isOpen} onClose={handleClose} title="Congratulations!">
@@ -161,7 +161,7 @@ export default function Home() {
         </Dialog>
         <section>
           {/* NFTs to be shown with burn option */}
-          <NftsList isConfirmed={isConfirmed} />
+          <NftsList mintConfirmed={isConfirmed} />
         </section>
       </div>
     </>

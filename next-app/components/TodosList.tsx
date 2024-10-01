@@ -2,8 +2,8 @@
 
 import { deleteToDo, fetchToDos, IToDo, updateToDo } from '@/actions/todoCrud';
 import { cn } from '@/lib/utils';
-import { CheckCircle, Trash2 } from 'lucide-react'; // Importing CheckCircle
-import { useState } from 'react';
+import { CheckCircle, ChevronsUp, Trash2 } from 'lucide-react'; // Importing CheckCircle
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import TodoContainer from './TodoContainer';
 import { Button } from './ui/button';
@@ -38,8 +38,6 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
         priority: todo.priority
     });
 
-    const [updateSuccess, setUpdateSuccess] = useState(false); // For showing "Updated"
-
     const handleOpen = () => {
         if (todo.completed) {
             toast("History can't be rewritten!", {
@@ -48,7 +46,6 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
             return
         }
         setIsOpen(true);
-        setUpdateSuccess(false); // Reset success message when reopening dialog
     };
 
     const handleClose = () => {
@@ -107,36 +104,56 @@ const UpdateDialog = ({ todo, setTodos }: { todo: IToDo, setTodos: any }) => {
                 priority: todoData.priority
             });
 
-            setUpdateSuccess(true); // Show "Updated" message
 
             // Refetch the updated todos list
             const updatedTodos = await fetchToDos();
             setTodos(updatedTodos.todos.data); // Update the todos state with new data
 
-            // After 2 seconds, close the dialog
-            setTimeout(() => {
-                handleClose();
-            }, 2000);
+
+            handleClose();
+            toast("Cool upgrade!", {
+                description: "You just updated a ToDoo.",
+            })
+
 
         } catch (error) {
             console.error('Update failed:', error);
         }
     };
 
+    const priorityIcon = useMemo(() => {
+        switch (todo.priority) {
+            case 'low':
+                return <ChevronsUp height={20} width={20} className="text-blue-500" />;
+            case 'medium':
+                return <ChevronsUp height={20} width={20} className="text-green-500" />;
+            case 'high':
+                return <ChevronsUp height={20} width={20} className="text-red-500" />;
+            default:
+                return null;
+        }
+    }, [todo.priority]);
+
     return (
         <div>
             <div onClick={handleOpen}>
-                {/* Add stopPropagation to prevent the dialog from opening on CheckCircle click */}
-                <CheckCircle height={16} width={16} className={cn(`absolute bottom-[30px] left-[10px] z-20 cursor-pointer`, todo.completed && 'text-green-500')}
-                    onClick={(event) => handleComplete(event, todo.id!)} />
-                <div className="rounded-xl bg-white relative z-10 border-black border-1 p-2 text-sm pl-10">{todo.title}</div>
+                <div className="flex gap-2 justify-between items-center rounded-xl bg-white relative z-10 border-black border-1 p-2 text-sm px-4">
+                    <div className='flex gap-4 items-center justify-between'>
+                        <CheckCircle height={16} width={16} className={cn(`z-20 cursor-pointer`, todo.completed && 'text-green-500')}
+                            onClick={(event) => handleComplete(event, todo.id!)} />
+                        <p>{todo.title}</p>
+                    </div>
+                    <div className='flex gap-4 items-center justify-between capitalize'>
+                        {todo.priority} {priorityIcon} {new Date(todo.dueDate).toLocaleDateString()}
+                        <Trash2 height={16} width={16} className="z-20 relative cursor-pointer" onClick={(event) => handleDelete(event, todo.id!)} />
+                    </div>
+                </div>
                 <div className="z-0 bg-black m-auto relative w-[98%] h-5 rounded-2xl bottom-4"></div>
-                <Trash2 height={16} width={16} className="absolute float-right bottom-[30px] right-[10px] z-20 cursor-pointer" onClick={(event) => handleDelete(event, todo.id!)} />
             </div>
             <Dialog isOpen={isOpen} onClose={handleClose} title="Update Todoo">
                 <TodoContainer todoData={todoData} handleChange={handleChange} />
                 <Button onClick={updateEntry} className="w-full bg-black text-white rounded-xl">
-                    {updateSuccess ? <><CheckCircle className="mr-2" size={16} /> Updated</> : "Update ToDoo"} {/* Added CheckCircle icon before Updated */}
+                    Update ToDoo
                 </Button>
             </Dialog>
         </div>
