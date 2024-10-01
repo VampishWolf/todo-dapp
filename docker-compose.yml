@@ -26,6 +26,7 @@ services:
   todo-api:
     build: ./api
     container_name: todo-api
+    image: todo-api
     ports:
       - "7979:7979"
     networks:
@@ -34,13 +35,19 @@ services:
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/dev"
     depends_on:
       - postgres
-  # next-app:
-  #   build: ./next-app
-  #   container_name: next-app
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - app-network
+
+  next-app:
+    build: ./next-app
+    container_name: next-app
+    image: next-app
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    environment:
+      BACKEND_API_BASE_URL: "http://todo-api:7979"
+      NEXT_PUBLIC_REOWN_PROJECT_ID: "c3f9c053752e031f7cfd17bd9ee19577"
+      MORALIS_API_KEY: ""
 
 networks:
   app-network:
